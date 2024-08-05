@@ -4,26 +4,25 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var bodyParser = require('body-parser');
-
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var productRouter = require('./routes/product');
 var studentsRouter = require('./routes/students');
-var categoryRouter = require('./routes/categoryrRouter');
-
-
+var categoryRouter = require('./routes/categoryRouter');
 
 var app = express();
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger-config');
 
 //config mongoose
 const mongoose = require('mongoose');
 require('./models/Category');
 require('./models/Product');
+require('./models/User');
 
 // conect database
 //connect database
-mongoose.connect('mongodb://127.0.0.1:27017/MOB402_t', {
+mongoose.connect('mongodb+srv://thuannicky1606:QrE7ufUjAe4Q8Wn4@thuannt.c7klvow.mongodb.net/MOB402_t', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -46,8 +45,9 @@ app.use('/product', productRouter);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/categoryRouter', categoryRouter);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use(bodyParser.json());
+
 
 
 // catch 404 and forward to error handler
@@ -66,9 +66,5 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
 
 module.exports = app;

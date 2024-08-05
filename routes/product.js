@@ -7,31 +7,38 @@ const mongoose = require('mongoose');
 var ObjectId = mongoose.Types.ObjectId
 var sendMail = require('../config/sendMail');
 var upload = require('../config/upload');
-const transporter = require('../config/sendMail'); // Import the configured transporter
+const transporters = require('../config/sendTemplateMail'); // Import the configured transporter
+const jwt = require('jsonwebtoken');
+const config = require('../config');
+const checkToken = require('../routes/checkToken');
 
 
-// Lấy thông tin tất cả các sản phẩm
-// Lấy thông tin sản phẩm theo ID
-// Lấy tên và giá của tất cả các sản phẩm
-// Lấy thông tin các sản phẩm có giá trên 1000
-// Lấy thông tin các sản phẩm thuộc loại 'Bánh'
-// Đếm số lượng sản phẩm trong mỗi loại (countDocuments)
-// Lấy thông tin sản phẩm có số lượng ít hơn 10
-// Cập nhật giá của sản phẩm theo ID, với giá người dùng truyền vào
-// Xóa sản phẩm theo ID
-// Lấy các sản phẩm có giá trong khoảng từ 500 đến 1500
-// Lấy tên và số lượng của các sản phẩm có số lượng lớn hơn 20
-// Lấy các sản phẩm có tên chứa từ khóa 'phone'
-// Lấy thông tin sản phẩm đắt nhất
-// Lấy thông tin sản phẩm rẻ nhất
-// Lấy giá trung bình của các sản phẩm
-
-
-// (*)Tính tổng giá trị của tất cả các sản phẩm (số lượng * giá)
-
-// Lấy thông tin tất cả các sản phẩm
-// http://localhost:3000/product/list
-router.get('/list', async function(req, res, next) {
+/**
+ * @swagger
+ * /product/list:
+ *   get:
+ *     summary: JWt
+ *     parameters:
+ *      - name: gender
+ *        in: query
+ *        description: Enter user gender here
+ *        required: true
+ *        schema:
+ *          type: string
+ *          enum: [ "user", "student", "manager"]
+ *     responses:
+ *       200:
+ *         description: Trả về danh sách sản phẩm
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *       400:
+ *         description: Lỗi
+ */
+router.get('/list', checkToken, async function(req, res, next) {
   try{
     const list = await productModel.find();
     res.status(200).json(list);
@@ -40,17 +47,37 @@ router.get('/list', async function(req, res, next) {
   }
 });
 
-// Lấy thông tin sản phẩm theo ID
-//http://localhost:3000/product/detailById
-router.get('/detailById', async function(req, res, next) {
+/**
+ * @swagger
+ * /product/detailById/{id}:
+ *   get:
+ *     summary: Lấy danh sách sản phẩm theo tên id  
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        schema:
+ *          type: string
+ *     responses:
+ *       200:
+ *         description: Trả về danh sách sản phẩm
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *       400:
+ *         description: Lỗi
+ */
+router.get('/detailById/:id', async function(req, res, next) {
   try{
-    var _id = req.body.id;
+    var _id = req.params.id;
     var list = await productModel.find({_id: _id});
     res.status(200).json(list);
   }catch(e){
     res.status(400).json({"err":"Lỗi"});
   }
-  
 });
 
 // Lấy tên và giá của tất cả các sản phẩm
@@ -74,9 +101,6 @@ router.get('/priceOver1000', async function(req, res, next) {
     res.status(400).json({"err":"Lỗi"});
   }
 });
-
-
-// câu này chưa xong
 
 // Lấy thông tin các sản phẩm thuộc loại 'Bánh'
 // http://localhost:3000/product/categoryCake
@@ -222,7 +246,6 @@ router.get('/averagePrice', async function(req, res, next) {
   }
 });
 
-
 // (*)Tính tổng giá trị của tất cả các sản phẩm (số lượng * giá)
 // http://localhost:3000/product/totalValue
 router.get('/totalValue', async function(req, res, next) {
@@ -284,24 +307,25 @@ router.post('/upload', [upload.single('image')],
         }
     });
 
-    // // http://localhost:3000/product/send-mail
-    // router.post("/send-mail", async function(req, res, next){
-    //   try{
-    //     const {to, subject, content} = req.body;
+  // // http://localhost:3000/product/send-mail
+  // router.post("/send-mail", async function(req, res, next){
+  //   try{
+  //     const {to, subject, content} = req.body;
+  
+  //     const mailOptions = {
+  //       from: "thuannguyen <admin@dinhnt.com>",
+  //       to: to,
+  //       subject: subject,
+  //       html: content
+  //     };
+  //     await sendMail.transporter.sendMail(mailOptions);
+  //     res.json({ status: 1, message: "Gửi mail thành công"});
+  //   }catch(err){
+  //     res.json({ status: 0, message: "Gửi mail thất bại"});
+  //   }
+  // });
     
-    //     const mailOptions = {
-    //       from: "thuannguyen <admin@dinhnt.com>",
-    //       to: to,
-    //       subject: subject,
-    //       html: content
-    //     };
-    //     await sendMail.transporter.sendMail(mailOptions);
-    //     res.json({ status: 1, message: "Gửi mail thành công"});
-    //   }catch(err){
-    //     res.json({ status: 0, message: "Gửi mail thất bại"});
-    //   }
-    // });
-    
+
 // how to send template html email 
 // http://localhost:3000/product/send-mail-template
 router.post("/send-mail-template", async function(req, res, next) {
@@ -319,14 +343,52 @@ router.post("/send-mail-template", async function(req, res, next) {
       }
     };
 
-    await transporter.sendMail(mailOptions);
+    await transporters.sendMail(mailOptions);
     res.json({ status: 1, message: "Gửi mail thành công" });
   } catch (err) {
     res.json({ status: 0, message: "Gửi mail thất bại" });
   }
 });
 
-module.exports = router;
+/**
+ * @swagger
+ * /product/getListByName/{name}:
+ *   get:
+ *     summary: Lấy danh sách sản phẩm theo tên
+ *     parameters:
+ *      - in: path
+ *        name: name
+ *        required: true
+ *        schema:
+ *          type: string
+ *     responses:
+ *       200:
+ *         description: Trả về danh sách sản phẩm
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *       400:
+ *         description: Lỗi
+ */
+router.get('/getListByName/:name', async function(req, res, next) {
+  try{
+    const name = req.params.name;
+    var list = await productModel.findOne({name: name});
+    res.status(200).json(list);
+  }catch(e){
+    res.status(400).json({"err":"Lỗi"});
+  }
+});
+
+
+
+
+
+
+
 
 
 

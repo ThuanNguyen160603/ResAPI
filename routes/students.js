@@ -1,18 +1,6 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
-
-
-// - Tạo ra 1 danh sách sinh viên gồm các thông tin sau: mssv, họ tên, lớp, dtb             x
-// - Thêm mới một sinh viên vào danh sách                                                   x
-// - Thay đổi thông tin sinh viên theo mssv,                                               x                                            
-// - Xóa một sv ra khỏi danh sách                                                       x
-// - Lấy thông tin chi tiết của một sv theo mssv                                       x                                    
-// - Lấy danh sách các sinh viên có điểm trung bình từ 6.5 đến 8.0             x                        
-// - Lấy ra danh sách các sinh viên thuộc lớp MD18401 và có điểm trung bình lớn hơn 9   x               
-// - Sắp xếp danh sách sinh viên theo điểm trung bình
-// - Tìm ra sinh viên có điểm trung bình cao nhập thuộc lớp MD18401
 
 var list = [
             {'mssv': 1, 'name': 'A', 'lop': "MD18401", 'dtb': 7.5},
@@ -23,8 +11,7 @@ var list = [
         ];
 
 
-//Hiện list
-// http://localhost:3000/students/list
+
 router.get('/list', function(req, res, next) {
     res.status(200).json(list);
 

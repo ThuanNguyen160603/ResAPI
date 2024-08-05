@@ -3,14 +3,15 @@ const hbs = require('nodemailer-express-handlebars');
 const path = require('path');
 
 // Create a transporter
-const transporter = nodemailer.createTransport({
+const transporters = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
     secure: true,
   auth: {
      user: 'thuanntps24818@fpt.edu.vn',
       pass: 'hjwwbxvtqqqsiowu'
-  }
+  },
+
 });
 
 // Configure the template engine
@@ -23,6 +24,6 @@ const handlebarOptions = {
   extName: '.hbs',
 };
 
-transporter.use('compile', hbs(handlebarOptions));
+transporters.use('compile', hbs(handlebarOptions));
 
-module.exports = transporter;
+module.exports = transporters;
