@@ -13,6 +13,53 @@ const config = require('../config');
 const checkToken = require('../routes/checkToken');
 
 
+/*                           
+1 xem                 x
+2 Thêm người dùng     x              
+3 Xóa người dùng       x              
+4 Sửa                   x
+*/ 
+
+// Sửa san pham theo Id
+// http://localhost:3000/product/updateById
+router.put('/updateById', checkToken, async function(req, res, next) {
+  try{
+    const {id, name, price, quantity, image, category} = req.body;
+    const newItem = {name, price, quantity, image, category};
+    await productModel.updateOne({_id: id}, newItem);
+    res.status(200).json({status: true, message: "Sửa sản phẩm thành công"});
+  }catch(e){
+    res.status(500).json({status: false, message: e.message});
+  }
+});
+
+
+//xóa sản phẩm theo Id
+// http://localhost:3000/product/deleteById
+router.delete('/deleteById/:id', checkToken, async function(req, res, next) {
+  try{
+    var id = req.params.id;
+    var list = await productModel.deleteOne({ _id: id });
+    res.status(200).json(list);
+  }catch(e){
+    res.status(400).json({"err":"Lỗi"});
+  }
+});
+
+// thêm
+// http://localhost:3000/product/add
+router.post('/add', checkToken,  async function(req, res, next) {
+  try{
+    const {name, price, quantity, image, category} = req.body;
+    const newItem = {name, price, quantity, image, category};
+    await productModel.create(newItem);
+    res.status(200).json({status: true, message: "Thêm sản phẩm thành công"});
+  }catch(e){
+    res.status(500).json({status: false, message: e.message});
+  }
+});
+
+// xem
 /**
  * @swagger
  * /product/list:

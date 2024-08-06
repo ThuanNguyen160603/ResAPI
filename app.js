@@ -9,6 +9,7 @@ var usersRouter = require('./routes/users');
 var productRouter = require('./routes/product');
 var studentsRouter = require('./routes/students');
 var categoryRouter = require('./routes/categoryRouter');
+var orderRouter = require('./routes/orderRouter');
 
 var app = express();
 const swaggerUi = require('swagger-ui-express');
@@ -16,9 +17,11 @@ const swaggerDocument = require('./swagger-config');
 
 //config mongoose
 const mongoose = require('mongoose');
+const Order = require('./models/Order');
 require('./models/Category');
 require('./models/Product');
 require('./models/User');
+require('./models/Order');
 
 // conect database
 //connect database
@@ -46,6 +49,8 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/categoryRouter', categoryRouter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/orderRouter', orderRouter);
+
 
 
 

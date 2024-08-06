@@ -1,2 +1,23 @@
 <h1>{{title}}</h1>
-<p>Welcome to 1 {{title}}</p>
+
+<a href="/add">Thêm</a>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Tên sản phẩm</th>
+        <th>Giá</th>
+        <th>Loại</th>
+        <th>Thao tác</th>
+    </tr>
+    {{#each list}}
+    <tr>
+        <td>{{_id}}</td>
+        <td>{{name}}</td>
+        <td>{{price}}</td>
+        <td>{{category.name}}</td>
+        <td><a href="">Sửa</a> | <a href="/delete/{{_id}}">Xóa</a></td>
+    </tr>
+    {{/each}}
+
+</table>

@@ -6,6 +6,7 @@ var jwt = require('jsonwebtoken');
 var config = require('../config');
 const { verify } = require('../config/sendTemplateMail');
 const { token } = require('morgan');
+const checkToken = require('./checkToken');
 /* GET users listing. */
 
 /*
@@ -15,10 +16,11 @@ const { token } = require('morgan');
 4 Thêm người dùng                    x
 5 Xóa người dùng                     x     
 6 Sửa
+7 Đổi mk
 */ 
 
 // http://localhost:3000/users/register
-router.post('/register', async function(req, res, next) {
+router.post('/register', checkToken ,async function(req, res, next) {
   try{
     const {username, fullname, email, phone, password, adress} = req.body;
     const checkUser = await userModel.findOne({username});
@@ -40,7 +42,7 @@ router.post('/login', async function(req, res, next) {
     const {username, password} = req.body;
     const checkUser = await userModel.findOne({username, password});
     if(checkUser){
-      const token = jwt.sign({user: username, data: "Ahihi"}, config.SECRETKEY, {expiresIn: '30s'});
+      const token = jwt.sign({user: username, data: "Ahihi"}, config.SECRETKEY, {expiresIn: '1000s'});
       const refreshToken = jwt.sign({ username, password}, config.SECRETKEY, {expiresIn: '1d'});
       res.status(200).json({status: true, message : "Login thành công", token: token, refreshToken: refreshToken});
     }else{
@@ -70,7 +72,7 @@ router.post('/refreshToken', async function(req, res, next){
  * @swagger
  * /users/listUser:
  *   get:
- *     summary: Lấy danh sách người dùng
+ *     summary: Lấy danh sách người dùng 
  *     responses:
  *       200:
  *         description: Trả về danh sách sản phẩm
@@ -83,7 +85,7 @@ router.post('/refreshToken', async function(req, res, next){
  *       500:
  *         description: Lỗi
  */
-router.get('/listUser', async function(req, res, next){
+router.get('/listUser', checkToken, async function(req, res, next){
   try{
     const list = await userModel.find();
     res.status(200).json(list);
@@ -94,7 +96,7 @@ router.get('/listUser', async function(req, res, next){
 
 // xóa người dùng
 //http://localhost:3000/users/deleteUser
-router.delete('/deleteUser', async function(req, res, next){
+router.delete('/deleteUser', checkToken, async function(req, res, next){
   try{
     var id = req.body.id;
     var list = await userModel.deleteOne({ _id: id });
@@ -106,7 +108,7 @@ router.delete('/deleteUser', async function(req, res, next){
 
 // sửa người dùng
 //http://localhost:3000/users/updateUser
-router.post('/updateUser', async function(req, res, next){
+router.post('/updateUser', checkToken, async function(req, res, next){
   try{
     var {id, username, fullname, email, phone, password, adress} = req.body;
     var list = await userModel.updateOne({_id: id}, {username, fullname, email, phone, password, adress});
